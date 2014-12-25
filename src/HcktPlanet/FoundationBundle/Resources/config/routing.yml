@@ -1,0 +1,3 @@
+hckt_planet_foundation_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: HcktPlanetFoundationBundle:Default:index }
