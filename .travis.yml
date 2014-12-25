@@ -15,21 +15,10 @@ git:
 php:
   - 5.5.9
 
-before_install:
-  - php composer.phar self-update
-# Use sed to replace the SSH URL with the public URL, then initialize submodules
-#  - sed -i 's/git@github.com:/https:\/\/tudommn:tudommn2014@github.com\//' .gitmodules
-#  - git submodule update --init --recursive
-
 before_script:
-#  - export USE_ZEND_ALLOC=0
   - composer install -n
-  - phpenv config-add travis.php.ini
   - php -i
 
-#install:
-#  - php -S 127.0.0.1:8000 payum/web/index.php
-    
 script:
  - rm app/cache/** -R -f
  - mkdir -p build/logs
