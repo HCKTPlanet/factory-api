@@ -3,7 +3,7 @@
  * Created By: Luciano Bargmann
  * Date: 25/12/14
  * Time: 04:10
- * © HCKTPlanet Informatica Ltda
+ * © HCKTPlanet Informática Ltda
  * All Rights Reserved. Unauthorized copies of this code file may subject you to civil and criminal liability.
  */
 
@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="fos_user")
+ * @ORM\Table(name="users")
  */
 class User extends BaseUser
 {
