@@ -6,6 +6,7 @@ use FOS\UserBundle\Entity\UserManager;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -20,9 +21,13 @@ class UserController extends Controller
      *      {"name"="username", "dataType"="string", "required"=false, "description"="Username to search by"}
      *    },
      *
+     *    output={
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
+     *      "groups" = {"user"}
+     *    },
+     *
      *    statusCodes={
-     *      200 = "Successfully returned a list of users (can be empty list as well)",
-     *      404 = "No user found with the given search criteria"
+     *      200 = "Successfully returned a list of users (can be an empty list)",
      *    }
      *
      * )
@@ -32,18 +37,8 @@ class UserController extends Controller
      */
     public function getUsersAction()
     {
-
-        /** @var UserManager $userManager */
-        $userManager = $this->container->get('fos_user.user_manager');
+        $userManager = $this->getManager();
         $users = $userManager->findUsers();
-
-        if (count($users) === 0) {
-            $response = new Response();
-            $response->setStatusCode(404);
-
-            return $response;
-        }
-
         return $users;
     }
 
@@ -53,9 +48,14 @@ class UserController extends Controller
      * @ApiDoc(
      *    description = "Get a user",
      *
+     *    output={
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
+     *      "groups" = {"user"}
+     *    },
+     *
      *    statusCodes={
-     *      200 = "Successfully returned a list of users (can be empty list as well)",
-     *      404 = "User not found"
+     *      200 = "Successfully returned a list of users",
+     *      404 = "User Not Found"
      *    }
      *
      * )
@@ -65,13 +65,13 @@ class UserController extends Controller
      */
     public function getUserAction($id)
     {
-        /** @var UserManager $userManager */
-        $userManager = $this->container->get('fos_user.user_manager');
-        $user = $userManager->findUserBy(array('id' => $id));
+        $userManager = $this->getManager();
+        $user = $userManager->findUserByUsernameOrEmail($id);
 
         if (count($user) === 0) {
             $response = new Response();
             $response->setStatusCode(404);
+            $response->setContent("User Not Found");
 
             return $response;
         }
@@ -83,14 +83,44 @@ class UserController extends Controller
      * Creates a user
      *
      * @ApiDoc(
-     *    description = "Creates a user",
+     *    description = "Creates a user and returns it's id",
+     *
+     *    output={
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
+     *      "groups" = {"user"}
+     *    },
+     *
+     *    statusCodes={
+     *      200 = "Successfully created a user",
+     *      404 = "No user found with the given search criteria"
+     *    },
+     *
+     *    parameters={
+     *      {"name"="username", "dataType"="string", "required"=true, "description"="User's unique identifier"},
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="User's e-mail address"},
+     *      {"name"="password", "dataType"="string", "required"=true, "description"="User's password"}
+     *    },
      * )
      *
+     * #TODO #@Security("has_role('ROLE_ADMIN')")
      * @Rest\View()
      * @Rest\Post("/users")
      */
-    public function postUsersAction()
+    public function postUsersAction(Request $request)
     {
+        $userManager = $this->getManager();
+        $user = $userManager->createUser();
+
+        $user->setUsername($request->get('username'));
+        $user->setEmail($request->get('email'));
+        $user->setPassword($request->get('password'));
+
+        $user->addRole("ROLE_USER");
+        $user->setEnabled(true);
+
+
+
+
 
     }
 
@@ -100,6 +130,12 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Updates a user",
+     *
+     *    output={
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
+     *      "groups" = {"user"}
+     *    }
+     *
      * )
      *
      * @Rest\View()
@@ -115,6 +151,11 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Deletes a user",
+     *
+     *    output={
+     *      "groups" = {"user"}
+     *    }
+     *
      * )
      *
      * @Rest\View()
@@ -123,5 +164,13 @@ class UserController extends Controller
     public function deleteUsersAction($id)
     {
 
+    }
+
+    /**
+     * @return UserManager
+     */
+    protected function getManager()
+    {
+        return $this->container->get('fos_user.user_manager');
     }
 }
