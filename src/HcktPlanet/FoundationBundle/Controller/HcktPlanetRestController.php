@@ -30,17 +30,4 @@ class HcktPlanetRestController extends FOSRestController {
         $response->setStatusCode($statusCode);
         return $response;
     }
-
-
-    /** Creates a Response when input parameters are not valid
-     * @param $errors
-     * @return Response
-     */
-    public function createBadRequestResponse($errors)
-    {
-        $response = new Response();
-        $response->setContent($this->get('serializer')->serialize($errors, 'json'));
-        $response->setStatusCode(400);
-        return $response;
-    }
 } 

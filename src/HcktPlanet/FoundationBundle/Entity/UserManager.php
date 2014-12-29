@@ -25,12 +25,4 @@ class UserManager extends \FOS\UserBundle\Entity\UserManager {
 
         $this->em = $em;
     }
-
-    /**
-     * Persists a User object to the database
-     */
-    public function save(User $user) {
-        $this->em->persist($user);
-        $this->em->flush();
-    }
-} 
+}
