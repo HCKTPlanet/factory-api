@@ -54,7 +54,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
     {
         $user = new User();
         $user->setUsername($username);
-        $user->setPlainPassword($password);
+        $user->setPassword($password);
         $user->setEmail($username . '@mailtrap.io');
         $user->setEnabled(true);
 
