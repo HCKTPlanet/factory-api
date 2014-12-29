@@ -22,8 +22,7 @@ class UserController extends Controller
      *
      *    statusCodes={
      *      200 = "Successfully returned a list of users (can be empty list as well)",
-     *      400 = "Validation errors, errors list is returned under 'errors' key",
-     *      403 = "Returned when user makes too many requests or violates captcha"
+     *      404 = "No user found with the given search criteria"
      *    }
      *
      * )
@@ -49,19 +48,14 @@ class UserController extends Controller
     }
 
     /**
-     * Get a list of users
+     * Get a user
      *
      * @ApiDoc(
-     *    description = "Get a list of users",
-     *
-     *    filters={
-     *      {"name"="username", "dataType"="string", "required"=false, "description"="Username to search by"}
-     *    },
+     *    description = "Get a user",
      *
      *    statusCodes={
      *      200 = "Successfully returned a list of users (can be empty list as well)",
-     *      400 = "Validation errors, errors list is returned under 'errors' key",
-     *      403 = "Returned when user makes too many requests or violates captcha"
+     *      404 = "User not found"
      *    }
      *
      * )
@@ -71,8 +65,18 @@ class UserController extends Controller
      */
     public function getUserAction($id)
     {
-        $users = array();
-        return $users;
+        /** @var UserManager $userManager */
+        $userManager = $this->container->get('fos_user.user_manager');
+        $user = $userManager->findUserBy(array('id' => $id));
+
+        if (count($user) === 0) {
+            $response = new Response();
+            $response->setStatusCode(404);
+
+            return $response;
+        }
+
+        return $user;
     }
 
     /**
