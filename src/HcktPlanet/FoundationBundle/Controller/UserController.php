@@ -2,20 +2,21 @@
 
 namespace HcktPlanet\FoundationBundle\Controller;
 
-use FOS\UserBundle\Entity\UserManager;
+use HcktPlanet\FoundationBundle\Entity\User;
+use HcktPlanet\FoundationBundle\Entity\UserManager;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends Controller
+class UserController extends HcktPlanetRestController
 {
     /**
      * Get a list of users
      *
      * @ApiDoc(
      *    description = "Get a list of users",
+     *    section = "User",
      *
      *    filters={
      *      {"name"="username", "dataType"="string", "required"=false, "description"="Username to search by"}
@@ -39,7 +40,8 @@ class UserController extends Controller
     {
         $userManager = $this->getManager();
         $users = $userManager->findUsers();
-        return $users;
+
+        return $this->createSuccessResponse($users);
     }
 
     /**
@@ -47,6 +49,7 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Get a user",
+     *    section = "User",
      *
      *    output={
      *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
@@ -61,22 +64,20 @@ class UserController extends Controller
      * )
      *
      * @Rest\View()
-     * @Rest\Get("/users/{id}")
+     * @Rest\Get("/users/{usernameOrEmail}")
      */
-    public function getUserAction($id)
+    public function getUserAction($usernameOrEmail)
     {
         $userManager = $this->getManager();
-        $user = $userManager->findUserByUsernameOrEmail($id);
+        $user = $userManager->findUserByUsernameOrEmail($usernameOrEmail);
 
-        if (count($user) === 0) {
+        if (!$user) {
             $response = new Response();
             $response->setStatusCode(404);
-            $response->setContent("User Not Found");
-
             return $response;
         }
 
-        return $user;
+        return $this->createSuccessResponse($user);
     }
 
     /**
@@ -84,15 +85,15 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Creates a user and returns it's id",
+     *    section = "User",
      *
      *    output={
-     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
-     *      "groups" = {"user"}
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User"
      *    },
      *
      *    statusCodes={
      *      200 = "Successfully created a user",
-     *      404 = "No user found with the given search criteria"
+     *      400 = "Incorrect or missing parameters. See error message for details."
      *    },
      *
      *    parameters={
@@ -109,19 +110,18 @@ class UserController extends Controller
     public function postUsersAction(Request $request)
     {
         $userManager = $this->getManager();
+
+        /** @var $user User */
         $user = $userManager->createUser();
 
         $user->setUsername($request->get('username'));
         $user->setEmail($request->get('email'));
         $user->setPassword($request->get('password'));
 
-        $user->addRole("ROLE_USER");
         $user->setEnabled(true);
+        $userManager->save($user);
 
-
-
-
-
+        return $this->createSuccessResponse($user);
     }
 
 
@@ -130,10 +130,10 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Updates a user",
+     *    section = "User",
      *
      *    output={
-     *      "class" = "HcktPlanet\FoundationBundle\Entity\User",
-     *      "groups" = {"user"}
+     *      "class" = "HcktPlanet\FoundationBundle\Entity\User"
      *    }
      *
      * )
@@ -151,10 +151,7 @@ class UserController extends Controller
      *
      * @ApiDoc(
      *    description = "Deletes a user",
-     *
-     *    output={
-     *      "groups" = {"user"}
-     *    }
+     *    section = "User"
      *
      * )
      *
@@ -171,6 +168,6 @@ class UserController extends Controller
      */
     protected function getManager()
     {
-        return $this->container->get('fos_user.user_manager');
+        return $this->container->get('hckt_planet_foundation.user_manager');
     }
 }
