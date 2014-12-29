@@ -80,32 +80,4 @@ fos_rest:
     routing_loader:
         default_format: json
 
-nelmio_api_doc:
-    name:                 'HcktPlanet Factory API documentation'
-    exclude_sections:     []
-
-    motd:
-        template:             'NelmioApiDocBundle::Components/motd.html.twig'
-    request_listener:
-        enabled:              true
-        parameter:            _doc
-    sandbox:
-        enabled:              true
-        endpoint:             null
-        accept_type:          null
-        body_format:
-            formats:
-
-                # Defaults:
-                - form
-                - json
-                - xml
-            default_format:       json # One of "form"; "json"
-        request_format:
-            formats:
-
-                # Defaults:
-                json:                application/json
-                xml:                 application/xml
-            method:               accept_header # One of "format_param"; "accept_header"
-            default_format:       json
+nelmio_api_doc: ~
