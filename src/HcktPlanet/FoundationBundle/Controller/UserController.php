@@ -2,6 +2,7 @@
 
 namespace HcktPlanet\FoundationBundle\Controller;
 
+use FOS\UserBundle\Entity\UserManager;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -32,7 +33,10 @@ class UserController extends Controller
      */
     public function getUsersAction()
     {
-        $users = array();
+
+        /** @var UserManager $userManager */
+        $userManager = $this->container->get('fos_user.user_manager');
+        $users = $userManager->findUsers();
 
         if (count($users) === 0) {
             $response = new Response();
