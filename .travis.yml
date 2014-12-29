@@ -20,7 +20,7 @@ before_script:
   - composer install -n
   - php -i
   - mysql -e 'create database symfony;'
-  - php app/console doctrine:schema:create --force
+  - php app/console doctrine:schema:create
 
 
 script:
