@@ -82,4 +82,5 @@ fos_rest:
         default_format: json
         include_format:       false
 
-nelmio_api_doc: ~
+nelmio_api_doc:
+    name:  Factory Back-End API Documentation
