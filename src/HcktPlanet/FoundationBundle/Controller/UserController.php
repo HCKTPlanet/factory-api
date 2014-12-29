@@ -87,6 +87,12 @@ class UserController extends HcktPlanetRestController
      *    description = "Creates a user and returns it's id",
      *    section = "User",
      *
+     *    parameters={
+     *      {"name"="username", "dataType"="string", "required"=true, "description"="User's unique identifier"},
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="User's e-mail address"},
+     *      {"name"="password", "dataType"="string", "required"=true, "description"="User's password"}
+     *    },
+     *
      *    output={
      *      "class" = "HcktPlanet\FoundationBundle\Entity\User"
      *    },
@@ -96,11 +102,6 @@ class UserController extends HcktPlanetRestController
      *      400 = "Incorrect or missing parameters. See error message for details."
      *    },
      *
-     *    parameters={
-     *      {"name"="username", "dataType"="string", "required"=true, "description"="User's unique identifier"},
-     *      {"name"="email", "dataType"="string", "required"=true, "description"="User's e-mail address"},
-     *      {"name"="password", "dataType"="string", "required"=true, "description"="User's password"}
-     *    },
      * )
      *
      * #TODO #@Security("has_role('ROLE_ADMIN')")
@@ -114,12 +115,13 @@ class UserController extends HcktPlanetRestController
         /** @var $user User */
         $user = $userManager->createUser();
 
+        // TODO: User 'Form' method
         $user->setUsername($request->get('username'));
         $user->setEmail($request->get('email'));
         $user->setPassword($request->get('password'));
 
         $user->setEnabled(true);
-        $userManager->save($user);
+        $userManager->updateUser($user);
 
         return $this->createSuccessResponse($user);
     }
@@ -132,6 +134,11 @@ class UserController extends HcktPlanetRestController
      *    description = "Updates a user",
      *    section = "User",
      *
+     *    parameters={
+     *      {"name"="id", "dataType"="integer", "required"=true, "description"="User's id"},
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="User's e-mail address"},
+     *    },
+     *
      *    output={
      *      "class" = "HcktPlanet\FoundationBundle\Entity\User"
      *    }
@@ -139,11 +146,21 @@ class UserController extends HcktPlanetRestController
      * )
      *
      * @Rest\View()
-     * @Rest\Put("/users/{id}")
+     * @Rest\Put("/users")
      */
-    public function putUsersAction($id)
+    public function putUsersAction(Request $request)
     {
+        $userManager = $this->getManager();
 
+        $user = $userManager->findUserBy(array(
+            'id' => $request->get('id')
+        ));
+
+        // TODO: User 'Form' method
+        $user->setEmail($request->get('email'));
+
+        $userManager->updateUser($user);
+        return $this->createSuccessResponse($user);
     }
 
     /**
@@ -151,8 +168,12 @@ class UserController extends HcktPlanetRestController
      *
      * @ApiDoc(
      *    description = "Deletes a user",
-     *    section = "User"
+     *    section = "User",
      *
+     *    statusCodes={
+     *      200 = "Successfully deleted the user",
+     *      404 = "User Not Found"
+     *    }
      * )
      *
      * @Rest\View()
@@ -160,6 +181,21 @@ class UserController extends HcktPlanetRestController
      */
     public function deleteUsersAction($id)
     {
+        $userManager = $this->getManager();
+
+        /** @var $user User */
+        $user = $userManager->findUserBy(array('id' => $id));
+
+        if (!$user) {
+            $response = new Response();
+            $response->setStatusCode(404);
+            return $response;
+        }
+
+        $user->setEnabled(false);
+        $userManager->updateUser($user);
+
+        return $this->createSuccessResponse();
 
     }
 
