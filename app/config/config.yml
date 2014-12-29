@@ -75,12 +75,11 @@ fos_user:
     db_driver: orm
     firewall_name: main
     user_class: HcktPlanet\FoundationBundle\Entity\User
-    use_listener: false
 
 fos_rest:
     routing_loader:
         default_format: json
-        include_format:       false
+        include_format: false
 
 nelmio_api_doc:
-    name:  Factory Back-End API Documentation
+    name:  Factory Back-End API

@@ -37,7 +37,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         //Create 10 users
-        for ($id = 300; $id <= 310; ++$id) {
+        for ($id = 300; $id < 310; ++$id) {
             $user = $this->createTestUser('user' . $id, 'p@ssw0rd');
             $manager->persist($user);
         }
